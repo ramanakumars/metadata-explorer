@@ -1,23 +1,12 @@
-import logo from './logo.svg';
-import './App.css';
+import './index.css'
+import Explorer from './Explorer';
+import Sidebar from './Sidebar';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="lg:container box-border lg:mx-auto grid grid-cols-5 gap-4">
+      <Sidebar />
+      <Explorer />
     </div>
   );
 }
