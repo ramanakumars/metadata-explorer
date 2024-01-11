@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap');
+
+* {
+  font-family: 'Noto Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+div {
+  @apply box-border block;
+}
+
+form {
+  @apply flex-auto flex-col;
+}
+
+form > * {
+  @apply container m-2 mx-auto;
+}
+
+form > span > * {
+  @apply flex-auto;
+}
+
+form > span > label {
+  @apply italic mx-auto;
+}
+
+.submit {
+  @apply w-20 bg-slate-800 text-white p-2 cursor-pointer;
+}
+
+.submit:hover {
+  @apply bg-slate-600;
+}
+
+.sidebarContainer {
+  @apply container p-2;
+}
+
+.image-controls > div {
+  @apply py-2;
+}
+
+.image-page button {
+  @apply border-0 cursor-pointer mx-2 my-0 px-2 bg-slate-400;
+}
+
+.image-page button:hover {
+  @apply bg-slate-600;
+}
+
+.num-images-control {
+  @apply max-w-md;
+}
+
+.num-images-control > span {
+  @apply py-0 grid grid-cols-8 !important;
+}
+
+.num-images-control > span > label {
+  @apply col-span-7 !important;
+}
+
+.num-images-control > span > select {
+  @apply col-span-1 !important;
+}
