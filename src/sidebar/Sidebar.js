@@ -54,7 +54,7 @@ export default function Sidebar({ setParentData }) {
             setVariables([]);
             setParentData({});
         }
-    }, [data])
+    }, [data, setParentData])
 
     /* check the plot metadata and enable plotting after validating */
     useEffect(() => {
@@ -73,13 +73,13 @@ export default function Sidebar({ setParentData }) {
                         x: dat.metadata[plot_metadata.x],
                         y: dat.metadata[plot_metadata.y],
                         // pass in null values to the color if "None" is selected
-                        c: plot_metadata.c == "None" ? null : dat.metadata[plot_metadata.c]
+                        c: plot_metadata.c === "None" ? null : dat.metadata[plot_metadata.c]
                     }
                 ))
             };
             setParentData(_plot_data);
         }
-    }, [data, variables, plot_metadata]);
+    }, [data, variables, plot_metadata, setParentData]);
 
     /* when the data is set, loop through it and get the
      * relevant plotting variables
