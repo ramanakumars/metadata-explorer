@@ -113,10 +113,6 @@ export default function Sidebar({ setParentData }) {
         }
     }, [data]);
 
-    const doPlot = () => {
-        console.log('doplot');
-    }
-
     return (
         <div id='sidebar' className='min-h-dvh col-span-1 bg-slate-400 flex-auto flex-col'>
             <FilePicker
