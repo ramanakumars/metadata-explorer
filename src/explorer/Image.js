@@ -1,5 +1,3 @@
-import React, { useState, useEffect } from "react";
-
 export default function Image({metadata}) {
     return (
         <span key={metadata.id + "_span"} className="col-span-1">
