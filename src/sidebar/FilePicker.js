@@ -14,8 +14,8 @@ export default function FilePicker({ setFile }) {
         <div className="sidebarContainer">
             <form onSubmit={handleSubmit} method="POST" encType="multipart/form-data" className="upload">
                 <span className="box-border block max-w-full overflow-x-clip">
-                    <label htmlFor="file">Upload metadata</label>
-                    <input type="file" id="umap" name='umap' accept='application/json' />
+                    <label htmlFor="file" className="italic font-bold py-2">Upload metadata</label>
+                    <input type="file" id="input_file" name='input_file' accept='application/json' />
                 </span>
                 <input type="submit" value="Submit" className='submit' />
             </form>
