@@ -8,6 +8,8 @@
   font-family: 'Noto Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: bg-white;
+  color: text-black;
 }
 
 code {
@@ -32,15 +34,15 @@ form > span > * {
 }
 
 form > span > label {
-  @apply italic mx-auto;
+  @apply mx-auto;
 }
 
 .submit {
-  @apply w-20 bg-slate-800 text-white p-2 cursor-pointer;
+  @apply w-20 bg-primary-800 text-white p-2 cursor-pointer;
 }
 
 .submit:hover {
-  @apply bg-slate-600;
+  @apply bg-primary-600;
 }
 
 .sidebarContainer {
@@ -52,11 +54,11 @@ form > span > label {
 }
 
 .image-page button {
-  @apply border-0 cursor-pointer mx-2 my-0 px-2 bg-slate-400;
+  @apply border-0 cursor-pointer mx-2 my-0 px-2 bg-primary-300 text-black;
 }
 
 .image-page button:hover {
-  @apply bg-slate-600;
+  @apply bg-primary-200;
 }
 
 .num-images-control {
