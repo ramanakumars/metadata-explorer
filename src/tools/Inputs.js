@@ -29,7 +29,7 @@ export function InputNumber({ minValue, maxValue, value, text, name, type, onCha
 
 	useEffect(() => {
 		onChange(_value);
-	}, [_value]);
+	}, [_value, onChange]);
 
 	const _parseChange = () => {
 		var value = parseValue(_value, type);
@@ -37,8 +37,10 @@ export function InputNumber({ minValue, maxValue, value, text, name, type, onCha
 	}
 
 	return (
-		<span>
-			<label htmlFor={name}>{text}: </label>
+		<span className="container py-2 mx-auto grid gap-1 grid-cols-8">
+			<label htmlFor={name} className='col-span-2 p-1 text-right italic font-bold'>
+				{text}:
+			</label>
 			<input type='number'
 				name={name}
 				onChange={(e) => setValue(e.target.value)}
@@ -48,6 +50,44 @@ export function InputNumber({ minValue, maxValue, value, text, name, type, onCha
 				min={minValue}
 				max={maxValue}
 				step={step}
+				dir='rtl'
+				className={'text-right min-w-5'}
+			/>
+		</span>
+	)
+
+}
+
+export function Slider({ minValue, maxValue, value, text, name, type, onChange }) {
+	const [_value, setValue] = useState(value);
+
+	var step = 1;
+	if (type.includes('float')) {
+		step = 0.01;
+	}
+
+	useEffect(() => {
+		onChange(_value);
+	}, [_value, onChange]);
+
+	const _parseChange = () => {
+		var value = parseValue(_value, type);
+		setValue(value);
+	}
+
+	return (
+		<span className="container py-2 mx-auto grid gap-1 grid-cols-8">
+			<label htmlFor={name} className='col-span-2 p-1 text-right italic font-bold'>
+				{text}:
+			</label>
+			<input type='range'
+				name={name}
+				onChange={(e) => setValue(e.target.value)}
+				value={_value}
+				min={minValue}
+				max={maxValue}
+				step={step}
+				className={'text-right min-w-5'}
 			/>
 		</span>
 	)
@@ -92,7 +132,7 @@ export function Select({ id, var_name, variables, onChange, value }) {
 				name={var_name}
 				id={id}
 				defaultValue={_value}
-				className="col-span-6 p-1"
+				className="col-span-6 p-1 text-black"
 				key={var_name + "_select"}
 				onChange={(event) => setValue(event.target.value)}
 			>
@@ -126,6 +166,7 @@ export function InputMultiRange({ minValue, maxValue, step, type, text, onChange
 			return NaN;
 		}
 	};
+
 	const validateMax = (value) => {
 		if (!isNaN(value)) {
 			return Math.min(value, absMax);
@@ -137,11 +178,11 @@ export function InputMultiRange({ minValue, maxValue, step, type, text, onChange
 	useEffect(() => {
 		setMaxValue(validateMax(_maxValue));
 		setMinValue(validateMin(_minValue));
-	}, [minValue, maxValue, _minValue, _maxValue]);
+	}, [minValue, maxValue, _minValue, _maxValue, absMin, absMax]);
 
 	useEffect(() => {
 		onChange(_minValue, _maxValue);
-	}, [_minValue, _maxValue]);
+	}, [_minValue, _maxValue, onChange]);
 
 	return (
 		<div className='slider'>
