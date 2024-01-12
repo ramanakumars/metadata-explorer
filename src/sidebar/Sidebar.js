@@ -54,7 +54,7 @@ export default function Sidebar({ setParentData }) {
             setVariables([]);
             setParentData({});
         }
-    }, [data, setParentData])
+    }, [data])
 
     /* check the plot metadata and enable plotting after validating */
     useEffect(() => {
@@ -79,7 +79,7 @@ export default function Sidebar({ setParentData }) {
             };
             setParentData(_plot_data);
         }
-    }, [data, variables, plot_metadata, setParentData]);
+    }, [data, variables, plot_metadata]);
 
     /* when the data is set, loop through it and get the
      * relevant plotting variables
@@ -114,7 +114,7 @@ export default function Sidebar({ setParentData }) {
     }, [data]);
 
     return (
-        <div id='sidebar' className='min-h-dvh col-span-1 bg-slate-400 flex-auto flex-col'>
+        <div id='sidebar' className='min-h-dvh col-span-1 bg-primary-400 text-black flex-auto flex-col px-2'>
             <FilePicker
                 setFile={setFile}
             />
