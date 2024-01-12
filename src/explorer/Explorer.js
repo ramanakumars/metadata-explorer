@@ -3,19 +3,14 @@ import Plot from "react-plotly.js";
 import Images from "./Images";
 import PlotStyleControl from "./PlotStyleControl";
 
-const normalize = (val) => {
-    const min = Math.min(...val);
-    const max = Math.max(...val);
-    const scale = max - min;
 
-    return val.map((v) => ((v - min) / scale));
-}
+const mean = (val) => (val.reduce((a, b) => (parseFloat(a) + parseFloat(b))) / val.length);
 
 const colorscales = {
     'bwr': [
-        [0, 'rgb(0, 0, 255)'],
+        [0., 'rgb(0, 0, 255)'],
         [0.5, 'rgb(255, 255, 255)'],
-        [1, 'rgb(255, 0, 0)']
+        [1., 'rgb(255, 0, 0)']
     ],
     'viridis': [
         [0.000, "rgb(68, 1, 84)"],
@@ -34,12 +29,16 @@ const colorscales = {
 export default function Explorer({ data }) {
     const [plot_data, setPlotlyData] = useState([]);
     const [image_data, setImageData] = useState([]);
-    const [plot_style, setPlotStyle] = useState({marker_size: 5, marker_opacity: 1., colorscale: 'bwr'});
+    const [plot_style, setPlotStyle] = useState({
+        marker_size: 5,
+        marker_opacity: 1.,
+        colorscale: 'bwr',
+        clamp_colorscale_mean: true
+    });
     const [layout, setLayout] = useState({
         hovermode: "closest",
         height: 600
     });
-    const [revision, setRevision] = useState(0);
 
     /* handle the plot selection
      * this function will update the images based on the selection 
@@ -114,9 +113,19 @@ export default function Explorer({ data }) {
 
             if ((data.plot_variables.c === "None") || (data.plot_variables.c === "")) {
                 _data.marker.color = _data.x.map(() => ("dodgerblue"));
+                _data.marker.colorbar = undefined;
             } else {
-                _data.marker.color = normalize(data.c);
+                _data.marker.color = data.c; //normalize(data.c, plot_style.clamp_colorscale_mean);
                 _data.marker.colorscale = colorscales[plot_style.colorscale];
+                _data.marker.cmin = plot_style.clamp_colorscale_mean ? null : Math.min(...data.c);
+                _data.marker.cmax = plot_style.clamp_colorscale_mean ? null : Math.max(...data.c);
+                _data.marker.cmid = plot_style.clamp_colorscale_mean ? 0 : mean(data.c);
+                _data.marker.colorbar = {
+                    title: {
+                        text: data.plot_variables.c,
+                        side: 'right'
+                    }
+                }
             }
 
             setPlotlyData([_data]);
@@ -130,33 +139,7 @@ export default function Explorer({ data }) {
             _layout.yaxis = { "title": data.plot_variables.y }
             setLayout(_layout);
         }
-    }, [data]);
-
-    useEffect(() => {
-        if ((plot_data[0] === undefined)) {
-            return;
-        }
-        if ((plot_data[0].x.length > 0) && (plot_data[0].y.length > 0)) {
-            const _plot_data = plot_data[0];
-            _plot_data.marker.size = plot_style.marker_size;
-            _plot_data.marker.opacity = plot_style.marker_opacity;
-            if ((data.plot_variables.c !== "None") && (data.plot_variables.c !== "")) {
-                _plot_data.marker.colorscale = colorscales[plot_style.colorscale];
-            }
-            setPlotlyData([_plot_data]);
-        }
-    }, [plot_style]);
-
-    useEffect(() => {
-        if ((plot_data[0] === undefined)) {
-            return;
-        }
-
-        if ((plot_data[0].x.length > 0) && (plot_data[0].y.length > 0)) {
-            setRevision(revision + 1);
-        }
-    }, [data, plot_data, layout]);
-
+    }, [data, plot_style]);
 
     return (
         <div id='explorer' className='p-4 col-span-4 overflow-x-hidden flex flex-col'>
@@ -166,7 +149,6 @@ export default function Explorer({ data }) {
             <Plot
                 data={plot_data}
                 layout={layout}
-                revision={revision}
                 onHover={handleHover}
                 onUnhover={handleUnHover}
                 onSelected={handlePlotSelect}

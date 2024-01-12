@@ -70,11 +70,6 @@ export function Slider({ minValue, maxValue, value, text, name, type, onChange }
 		onChange(_value);
 	}, [_value, onChange]);
 
-	const _parseChange = () => {
-		var value = parseValue(_value, type);
-		setValue(value);
-	}
-
 	return (
 		<span className="container py-2 mx-auto grid gap-1 grid-cols-8">
 			<label htmlFor={name} className='col-span-2 p-1 text-right italic font-bold'>
@@ -91,7 +86,29 @@ export function Slider({ minValue, maxValue, value, text, name, type, onChange }
 			/>
 		</span>
 	)
+}
 
+
+export function Checkbox({ value, text, name, onChange }) {
+	const [_checked, setChecked] = useState(value);
+	
+	useEffect(() => {
+		onChange(_checked);
+	}, [_checked, onChange]);
+	
+	return (
+		<span className="container py-2 mx-auto grid gap-1 grid-cols-8">
+			<label htmlFor={name} className='col-span-2 p-1 text-right italic font-bold'>
+				{text}:
+			</label>
+			<input type='checkbox'
+				name={name}
+				onChange={(e) => setChecked(!_checked)}
+				checked={_checked}
+				className={'text-right min-w-5'}
+			/>
+		</span>
+	)
 }
 
 export function Radio({ id, name, checked }) {
