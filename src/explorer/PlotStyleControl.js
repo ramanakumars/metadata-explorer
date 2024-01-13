@@ -17,8 +17,8 @@ export default function PlotStyleControl({ setPlotStyle }) {
     }, [marker_size, marker_opacity, clamp_colorscale_mean, colorscale]);
 
     return (
-        <div className='container p-2 mx-auto flex flex-row justify-evenly align-center'>
-            <span className='py-2 max-w-52 [&>span]:grid-cols-6 [&>span>label]:col-span-5 [&>span>input]:col-span-1'>
+        <div className='w-full p-2 mx-auto flex flex-row justify-between items-center'>
+            <span className='py-2 max-w-48 [&>span]:grid-cols-6 [&>span>label]:col-span-4 [&>span>input]:col-span-2'>
                 <InputNumber
                     minValue={1}
                     maxValue={20}
@@ -29,7 +29,7 @@ export default function PlotStyleControl({ setPlotStyle }) {
                     onChange={setMarkerSize}
                 />
             </span>
-            <span className='py-2 max-w-xs [&>span]:grid-cols-6 [&>span>label]:col-span-3 [&>span>input]:col-span-2'>
+            <span className='py-2 max-w-52 [&>span]:grid-cols-6 [&>span>label]:col-span-3 [&>span>input]:col-span-3'>
                 <Slider
                     minValue={0.01}
                     maxValue={1}
@@ -40,7 +40,7 @@ export default function PlotStyleControl({ setPlotStyle }) {
                     onChange={setMarkerOpacity}
                 />
             </span>
-            <span className='py-2 max-w-52 [&>span>label]:col-span-4 [&>span>select]:col-span-3'>
+            <span className='py-2 max-w-44 [&>span>label]:col-span-4 [&>span>select]:col-span-3'>
                 <Select
                     id='plot_colorscale'
                     var_name='Colorscale'
@@ -49,7 +49,7 @@ export default function PlotStyleControl({ setPlotStyle }) {
                     value={colorscale}
                 />
             </span>
-            <span className='py-2 max-w-xl [&>span>label]:col-span-7 [&>span>input]:col-span-1 [&>span>input]:w-5'>
+            <span className='py-2 w-80 [&>span>label]:col-span-7 [&>span>input]:col-span-1 [&>span>input]:w-5'>
                 <Checkbox
                     id='clamp_colorscale'
                     text='Clamp colorscale center to 0'
