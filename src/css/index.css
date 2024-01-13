@@ -8,8 +8,10 @@
   font-family: 'Noto Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: bg-white;
-  color: text-black;
+}
+
+html {
+  @apply text-black;
 }
 
 code {
@@ -37,12 +39,8 @@ form > span > label {
   @apply mx-auto;
 }
 
-.submit {
-  @apply w-20 bg-primary-800 text-white p-2 cursor-pointer;
-}
-
-.submit:hover {
-  @apply bg-primary-600;
+button, input[type=submit]{
+  @apply bg-primary-800 text-white h-8 hover:bg-primary-600
 }
 
 .sidebarContainer {

@@ -17,7 +17,7 @@ export default function FilePicker({ setFile }) {
                     <label htmlFor="file" className="italic font-bold py-2">Upload metadata</label>
                     <input type="file" id="input_file" name='input_file' accept='application/json' />
                 </span>
-                <input type="submit" value="Submit" className='submit' />
+                <input type="submit" value="Submit" className='cursor-pointer w-20' />
             </form>
         </div>
     )
