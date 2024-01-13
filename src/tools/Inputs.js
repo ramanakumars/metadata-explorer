@@ -199,7 +199,7 @@ export function InputMultiRange({ minValue, maxValue, step, type, text, onChange
 
 	useEffect(() => {
 		onChange(_minValue, _maxValue);
-	}, [_minValue, _maxValue, onChange]);
+	}, [_minValue, _maxValue]);
 
 	return (
 		<div className='slider'>
