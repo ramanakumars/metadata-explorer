@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import '../css/index.css';
 import MetadataPicker from "./MetadataPicker";
-import PlotControls from "./PlotControl";
 import FilePicker from "./FilePicker";
+import { FilterGroup } from "../explorer/VariableFilters";
 
 /* validate the metadata file, which should be list of dictionaries
  * with keys (id, url, metadata) in each dictionary
@@ -26,7 +26,9 @@ export default function Sidebar({ setParentData }) {
     const [data, setMetadata] = useState([]);
     const [variables, setVariables] = useState([]);
     const [plot_metadata, setPlotMetadata] = useState({});
-    const [plot_controls, setPlotControls] = useState({});
+    const [filters, updateFilters] = useState(0);
+
+    const filter_group = useRef(null);
 
     /* read in a file and set the metadata */
     const readFile = (file) => {
@@ -62,11 +64,13 @@ export default function Sidebar({ setParentData }) {
             return;
         }
 
+        const _data = data.filter(_dat => filter_group.current.checkMetadata(_dat.metadata));
+
         const _variables = variables.map((vari) => vari.name);
         if ((plot_metadata.x !== undefined) && (plot_metadata.y !== undefined) && (_variables.includes(plot_metadata.x)) && (_variables.includes(plot_metadata.y))) {
             const _plot_data = {
                 plot_variables: plot_metadata,
-                data: data.map((dat) => (
+                data: _data.map((dat) => (
                     {
                         id: dat.id,
                         url: dat.url,
@@ -79,7 +83,7 @@ export default function Sidebar({ setParentData }) {
             };
             setParentData(_plot_data);
         }
-    }, [data, variables, plot_metadata]);
+    }, [data, variables, plot_metadata, filters]);
 
     /* when the data is set, loop through it and get the
      * relevant plotting variables
@@ -99,6 +103,7 @@ export default function Sidebar({ setParentData }) {
 
                 var_data.minValue = var_data.currentMin = Math.min(...variable_sub);
                 var_data.maxValue = var_data.currentMax = Math.max(...variable_sub);
+                var_data.dtype = 'float';
                 return var_data;
             });
 
@@ -127,7 +132,11 @@ export default function Sidebar({ setParentData }) {
                 <></>
             }
             {file !== null ?
-                <PlotControls />
+                <FilterGroup
+                    ref={filter_group}
+                    variables={variables}
+                    onChange={() => updateFilters(Math.random())}
+                />
                 :
                 <></>
             }
