@@ -103,7 +103,17 @@ export default function Sidebar({ setParentData }) {
 
                 var_data.minValue = var_data.currentMin = Math.min(...variable_sub);
                 var_data.maxValue = var_data.currentMax = Math.max(...variable_sub);
-                var_data.dtype = 'float';
+
+                const checkFloat = (value) => (parseFloat(value) === value);
+                const checkInt = (value) => (parseInt(value) === value);
+
+                if (variable_sub.every(checkInt)) {
+                    var_data.dtype = 'int'
+                } else if(variable_sub.every(checkFloat)) {
+                    var_data.dtype = 'float';
+                } else {
+                    var_data.dtype = null;
+                }
                 return var_data;
             });
 

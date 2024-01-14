@@ -201,7 +201,7 @@ const Filter = forwardRef(function Filter({ id, variables, removeFilter, onChang
                                             key={_selected_variable.name + "_range"}
                                             minValue={_selected_variable.minValue}
                                             maxValue={_selected_variable.maxValue}
-                                            step={0.01}
+                                            step={_selected_variable.dtype == 'int'? 1 : 0.01}
                                             type={_selected_variable.dtype.includes('float') ? ('float') : ('int')}
                                             text={'Choose range for ' + _selected_variable.name}
                                             currentMin={_filter_value[0]}
