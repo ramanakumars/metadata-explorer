@@ -3,17 +3,17 @@ import MultiRangeSlider from "multi-range-slider-react";
 import '../css/index.css'
 
 
-const parseValue = (value, type) => {
+const parseValue = (value, type, default_value) => {
 	if (type.includes('float')) {
 		value = Number.parseFloat(value).toFixed(2);
 	} else if (type.includes('int')) {
 		value = parseInt(value);
 	} else {
-		value = '';
+		value = default_value;
 	}
 
 	if (isNaN(value)) {
-		value = '';
+		value = default_value;
 	}
 
 	return value;
@@ -32,7 +32,7 @@ export function InputNumber({ minValue, maxValue, value, text, name, type, onCha
 	}, [_value, onChange]);
 
 	const _parseChange = () => {
-		var value = parseValue(_value, type);
+		var value = parseValue(_value, type, minValue);
 		setValue(value);
 	}
 
@@ -50,7 +50,6 @@ export function InputNumber({ minValue, maxValue, value, text, name, type, onCha
 				min={minValue}
 				max={maxValue}
 				step={step}
-				dir='rtl'
 				className={'text-right min-w-5'}
 			/>
 		</span>
@@ -171,10 +170,10 @@ export function Select({ id, var_name, variables, onChange, value }) {
 
 
 export function InputMultiRange({ minValue, maxValue, step, type, text, onChange, currentMin, currentMax }) {
-	const [_minValue, setMinValue] = useState(parseValue(currentMin, type));
-	const [_maxValue, setMaxValue] = useState(parseValue(currentMax, type));
-	const absMin = parseValue(minValue, type);
-	const absMax = parseValue(maxValue, type);
+	const [_minValue, setMinValue] = useState(parseValue(currentMin, type, minValue));
+	const [_maxValue, setMaxValue] = useState(parseValue(currentMax, type, minValue));
+	const absMin = parseValue(minValue, type, 0);
+	const absMax = parseValue(maxValue, type, 0);
 
 	const validateMin = (value) => {
 		if (!isNaN(value)) {
@@ -250,7 +249,7 @@ function EditableText({ value, type, onChange }) {
 
 	const handleChange = () => {
 		setEditing(false);
-		var _value = parseValue(val, type);
+		var _value = parseValue(val, type, 0);
 		setValue(_value);
 		onChange(_value);
 	};
@@ -274,7 +273,7 @@ function EditableText({ value, type, onChange }) {
 				/>
 			) : (
 				<span className='editable-text' onClick={() => setEditing(true)}>
-					{parseValue(val, type)}
+					{parseValue(val, type, 0)}
 				</span>
 			)}
 		</div>
