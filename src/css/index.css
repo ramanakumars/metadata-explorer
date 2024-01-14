@@ -74,3 +74,15 @@ button, input[type=submit]{
 .num-images-control > span > select {
   @apply col-span-1 !important;
 }
+
+.slider-min {
+  @apply block w-1/4 box-border min-w-12;
+}
+
+.multi-range-slider {
+  @apply block w-full box-border border-0 shadow-none !important;
+}
+
+.bar-inner {
+  @apply bg-primary-800 shadow-none border-0 !important;
+}

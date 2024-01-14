@@ -202,7 +202,7 @@ export function InputMultiRange({ minValue, maxValue, step, type, text, onChange
 	}, [_minValue, _maxValue]);
 
 	return (
-		<div className='slider'>
+		<div className='w-full flex flex-wrap justify-between box-border'>
 			<label>{text}: </label>
 			<MultiRangeSlider
 				min={absMin}
@@ -219,7 +219,7 @@ export function InputMultiRange({ minValue, maxValue, step, type, text, onChange
 				}}
 			/>
 
-			<div className='slider-input'>
+			<div className='w-full flex flex-nowrap justify-between box-border'>
 				<span className='slider-min'>
 					<EditableText
 						value={_minValue}
