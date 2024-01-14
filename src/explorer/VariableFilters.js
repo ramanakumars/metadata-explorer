@@ -1,5 +1,7 @@
 import { InputMultiRange, Select, InputNumber } from "../tools/Inputs";
 import React, { useState, forwardRef, useEffect, createRef, createElement, useRef, useImperativeHandle } from "react";
+import { VscEdit } from "react-icons/vsc";
+import { RxCross2 } from "react-icons/rx";
 
 /* holds and renders the dynamic list of filters for the plot */
 export const FilterGroup = forwardRef(function FilterGroup({ variables, onChange }, ref) {
@@ -163,12 +165,12 @@ const Filter = forwardRef(function Filter({ id, variables, removeFilter, onChang
         <div className='w-full flex flex-col p-2 bg-primary-400 border-t-2 border-b-2'>
             <div className='w-full flex flex-row justify-end'>
                 {(_is_locked && _is_filled) &&
-                    <button onClick={() => setLock(false)} className="mx-2 w-6 h-6 block bg-white border-2 p-0 rounded-full align-middle text-center leading-3 font-bold text-black hover:bg-white hover:border-black">
-                        e
+                    <button onClick={() => setLock(false)} className="mx-2 w-6 h-6 box-border inline-block bg-white border-2 p-0 text-center rounded-full align-center font-bold text-black hover:bg-white hover:border-black">
+                        <VscEdit className="w-full h-4 "/>
                     </button>
                 }
-                <button onClick={() => removeFilter(id)} className="mx-2 w-6 h-6 block bg-white border-2 p-0 rounded-full align-middle text-center leading-6 font-bold text-black hover:bg-white hover:border-black">
-                    &times;
+                <button onClick={() => removeFilter(id)} className="mx-2 w-6 h-6 box-border inline-block bg-white border-2 p-0 rounded-full text-center align-center font-bold text-black hover:bg-white hover:border-black">
+                    <RxCross2 className="w-full h-4" />
                 </button>
             </div>
             {(!_is_locked || !_is_filled) &&
@@ -199,7 +201,7 @@ const Filter = forwardRef(function Filter({ id, variables, removeFilter, onChang
                                             key={_selected_variable.name + "_range"}
                                             minValue={_selected_variable.minValue}
                                             maxValue={_selected_variable.maxValue}
-                                            step={1}
+                                            step={0.01}
                                             type={_selected_variable.dtype.includes('float') ? ('float') : ('int')}
                                             text={'Choose range for ' + _selected_variable.name}
                                             currentMin={_filter_value[0]}
