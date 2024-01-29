@@ -69,13 +69,14 @@ export const FilterGroup = forwardRef(function FilterGroup({ variables, onChange
     return (
         <>
             <section className='container flex flex-col mx-auto my-2 border-2 rounded-xl border-dotted [&>*]:my-2 [&>*]:mx-auto'>
-                <button onClick={createFilter} className="min-h-8 w-3/4 text-white bg-primary-800 hover:bg-primary-600">Add filter</button>
+                <button onClick={createFilter} className="min-h-8 w-40 text-white bg-primary-800 hover:bg-primary-600">Add filter</button>
                 {[filters.current]}
             </section>
         </>
     )
 });
 
+/* individual variable filter */
 const Filter = forwardRef(function Filter({ id, variables, removeFilter, onChange }, ref) {
     const [_selected_variable, selectVariable] = useState("");
     const [_filter_mode, setFilterMode] = useState("");
@@ -83,6 +84,7 @@ const Filter = forwardRef(function Filter({ id, variables, removeFilter, onChang
     const [_is_locked, setLock] = useState(false);
     const [_is_filled, setFilled] = useState(false);
 
+    /* function to check the metadata using the current filter */
     const checkMetadata = (metadata) => {
         if ((!_is_filled) | (!_is_locked)) {
             return true;
@@ -90,6 +92,7 @@ const Filter = forwardRef(function Filter({ id, variables, removeFilter, onChang
 
         var value = metadata[_selected_variable.name];
 
+        /* if the filter is a range, then check the minimum and maximum */
         if (_filter_mode === 'range') {
             if ((value >= _filter_value[0]) && (value <= _filter_value[1])) {
                 return true;
@@ -98,6 +101,7 @@ const Filter = forwardRef(function Filter({ id, variables, removeFilter, onChang
             }
         }
 
+        /* if it is a value, then directly check the value of the metadata */
         if (_filter_mode === 'value') {
             if (value === _filter_value) {
                 return true;
@@ -117,12 +121,15 @@ const Filter = forwardRef(function Filter({ id, variables, removeFilter, onChang
         }
     }, [_filter_value]);
 
+    /* set the default state for the different filter modes */
     useEffect(() => {
         if (_filter_mode !== "") {
             if (!_filter_value) {
+                /* if it is a range, set the defualt range to the min and max value of the metadata */
                 if (_filter_mode === 'range') {
                     setFilterValue([_selected_variable.minValue, _selected_variable.maxValue]);
                 } else if (_filter_mode === 'value') {
+                /* if it is a value, then set this to zero. not the best default, but it works for now */
                     setFilterValue(0);
                 }
             }
@@ -133,18 +140,21 @@ const Filter = forwardRef(function Filter({ id, variables, removeFilter, onChang
         }
     }, [_filter_mode]);
 
+    /* when "submit" is hit, then lock and propagate the change up the tree */
     useEffect(() => {
         if (_is_locked) {
             onChange();
         }
     }, [_is_locked]);
 
+    /* check the values to see if it is filled, and lock the state when submit is hit */
     const checkAndLock = () => {
         if (_is_filled) {
             setLock(true);
         }
     }
 
+    /* handler for clicking on a specific variable from the dropdown */
     const clickVariable = (vari) => {
         var var_index;
         var_index = variables.map((v) => (v.name)).indexOf(vari);
