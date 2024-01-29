@@ -3,6 +3,29 @@ import '../css/index.css';
 import MetadataPicker from "./MetadataPicker";
 import FilePicker from "./FilePicker";
 import { FilterGroup } from "../explorer/VariableFilters";
+import MetadataViewer from "./MetadataViewer";
+
+
+// from https://stackoverflow.com/questions/12467542/how-can-i-check-if-a-string-is-a-float
+function checkFloat(val) {
+    var floatRegex = /^-?\d+(?:[.,]\d*?(e[+-]\d)?)?$/;
+    if (!floatRegex.test(val))
+        return false;
+
+    val = parseFloat(val);
+    if (isNaN(val))
+        return false;
+    return true;
+}
+
+function checkInt(val) {
+    var intRegex = /^-?\d+$/;
+    if (!intRegex.test(val))
+        return false;
+
+    var intVal = parseInt(val, 10);
+    return parseFloat(val) == intVal && !isNaN(intVal);
+}
 
 /* validate the metadata file, which should be list of dictionaries
  * with keys (id, url, metadata) in each dictionary
@@ -29,6 +52,7 @@ export default function Sidebar({ setParentData }) {
     const [filters, updateFilters] = useState(0);
 
     const filter_group = useRef(null);
+    const metadata_viewer = useRef(null);
 
     /* read in a file and set the metadata */
     const readFile = (file) => {
@@ -99,19 +123,23 @@ export default function Sidebar({ setParentData }) {
                 let var_data = {};
                 var_data.name = variable;
 
-                let variable_sub = data.map((dati) => (dati.metadata[variable]));
+                let variable_sub = data.map((dati) => ( "" + dati.metadata[variable]));
 
                 var_data.minValue = var_data.currentMin = Math.min(...variable_sub);
                 var_data.maxValue = var_data.currentMax = Math.max(...variable_sub);
 
-                const checkFloat = (value) => (parseFloat(value) === value);
-                const checkInt = (value) => (parseInt(value) === value);
+                // const checkFloat = (value) => (parseFloat(value) === value);
+                // const checkInt = (value) => (parseInt(value) === value);
 
                 if (variable_sub.every(checkInt)) {
                     var_data.dtype = 'int'
-                } else if(variable_sub.every(checkFloat)) {
+                } else if (variable_sub.every(checkFloat)) {
                     var_data.dtype = 'float';
                 } else {
+                    console.log(variable + " has non-numeric values");
+                    console.log(variable_sub.filter((e) => !checkFloat(e)));
+
+
                     var_data.dtype = null;
                 }
                 return var_data;
@@ -134,10 +162,16 @@ export default function Sidebar({ setParentData }) {
                 setFile={setFile}
             />
             {variables.length > 0 ?
-                <MetadataPicker
-                    variables={variables}
-                    handleChange={setPlotMetadata}
-                />
+                <>
+                    <MetadataViewer
+                        variables={variables}
+                        data={data}
+                    />,
+                    <MetadataPicker
+                        variables={variables}
+                        handleChange={setPlotMetadata}
+                    />
+                </>
                 :
                 <></>
             }
