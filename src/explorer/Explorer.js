@@ -6,26 +6,6 @@ import PlotStyleControl from "./PlotStyleControl";
 
 const mean = (val) => (val.reduce((a, b) => (parseFloat(a) + parseFloat(b))) / val.length);
 
-const colorscales = {
-    'bwr': [
-        [0., 'rgb(0, 0, 255)'],
-        [0.5, 'rgb(255, 255, 255)'],
-        [1., 'rgb(255, 0, 0)']
-    ],
-    'viridis': [
-        [0.000, "rgb(68, 1, 84)"],
-        [0.111, "rgb(72, 40, 120)"],
-        [0.222, "rgb(62, 74, 137)"],
-        [0.333, "rgb(49, 104, 142)"],
-        [0.444, "rgb(38, 130, 142)"],
-        [0.556, "rgb(31, 158, 137)"],
-        [0.667, "rgb(53, 183, 121)"],
-        [0.778, "rgb(109, 205, 89)"],
-        [0.889, "rgb(180, 222, 44)"],
-        [1.000, "rgb(253, 231, 37)"]
-    ]
-};
-
 export default function Explorer({ data }) {
     const [plot_data, setPlotlyData] = useState([]);
     const [image_data, setImageData] = useState([]);
@@ -116,7 +96,7 @@ export default function Explorer({ data }) {
                 _data.marker.colorbar = undefined;
             } else {
                 _data.marker.color = data.c; //normalize(data.c, plot_style.clamp_colorscale_mean);
-                _data.marker.colorscale = colorscales[plot_style.colorscale];
+                _data.marker.colorscale = plot_style.colorscale;
                 _data.marker.cmin = plot_style.clamp_colorscale_mean ? null : Math.min(...data.c);
                 _data.marker.cmax = plot_style.clamp_colorscale_mean ? null : Math.max(...data.c);
                 _data.marker.cmid = plot_style.clamp_colorscale_mean ? 0 : mean(data.c);
