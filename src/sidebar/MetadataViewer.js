@@ -79,12 +79,13 @@ const VariableInfo = ({ variable }) => {
     )
 }
 
+
+/* adapted from https://www.bekk.christmas/post/2021/2/how-to-lazy-render-large-data-tables-to-up-performance */
 const DataTable = ({ data, variables }) => {
     const [displayStart, setDisplayStart] = useState(0);
     const [displayEnd, setDisplayEnd] = useState(0);
     const [scrollPosition, setScrollPosition] = useState(0);
     const table = useRef(null);
-    const [height, setHeight] = useState(0);
     const [dataRows, setDataRows] = useState([]);
     const [itemRowHeight, setItemRowHeight] = useState(32);
 
@@ -92,11 +93,6 @@ const DataTable = ({ data, variables }) => {
         document.documentElement.clientHeight,
         window.innerHeight || 0
     );
-
-
-    useEffect(() => {
-        setHeight(data.length * itemRowHeight);
-    });
 
     const offset = view_height; // We want to render more than we see, or else we will see nothing when scrolling fast
 
@@ -134,7 +130,7 @@ const DataTable = ({ data, variables }) => {
                 setScrollPosition(scrollTop);
                 setDisplayPositions(scrollTop);
             }
-        }, 100);
+        }, 50);
         table.current.addEventListener("scroll", onScroll);
 
         return () => {
