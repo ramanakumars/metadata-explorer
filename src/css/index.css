@@ -90,3 +90,7 @@ button, input[type=submit]{
 tr {
   height: 32px;
 }
+
+td, th {
+  padding: 0px 0.25em;
+}

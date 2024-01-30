@@ -42,7 +42,7 @@ export default function MetadataViewer({ data, variables }) {
                             </div>
                         </div>
 
-                        <div className="flex flex-col justify-start box-border overflow-hidden">
+                        <div className="flex flex-col justify-center box-border overflow-hidden">
                             <h1 className="font-bold text-md">Data:</h1>
                             <DataTable data={data} variables={variables} />
                         </div>
@@ -62,14 +62,10 @@ const VariableInfo = ({ variable }) => {
 
     return (
         <div className='bg-secondary-300 min-h-10 p-2 text-black relative rounded-sm'>
-            <div className="flex flex-row justify-between">
+            <div className="flex flex-row justify-between cursor-pointer" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)} >
                 <span>{variable.name}</span>
-                <button onClick={toggleInfo} className="mx-2 w-6 h-6 box-border inline-block bg-white border-2 p-0 rounded-full text-center align-center font-bold text-black hover:bg-white hover:border-black">
-                    {open ?
-                        <RxCross2 className="w-full h-4" />
-                        :
-                        <MdArrowDropDown className="w-full h-4" />
-                    }
+                <button className="mx-2 w-6 h-6 box-border inline-block bg-white border-2 p-0 rounded-full text-center align-center font-bold text-black hover:bg-white">
+                    <MdArrowDropDown className="w-full h-4" />
                 </button>
             </div>
             {open &&
@@ -169,9 +165,9 @@ const DataTable = ({ data, variables }) => {
             if (row !== undefined) {
                 rows.push(
                     <tr key={row.id} className="Row">
-                        <td>{row.id}</td>
+                        <td key={row.id + " id"}>{row.id}</td>
                         {variables.map((variable) => (
-                            <td>{Math.round(row.metadata[variable.name] * 10000) / 10000}</td>
+                            <td key={row.id + " " + variable.name}>{Math.round(row.metadata[variable.name] * 10000) / 10000}</td>
                         ))}
                     </tr>
                 );
@@ -190,14 +186,16 @@ const DataTable = ({ data, variables }) => {
     }, [displayStart, displayEnd]);
 
     return (
-        <table className="mx-2 w-content block text-center [&>*>*]:font-mono border-collapse [&>*>*]:border [&>*>*]:border-black overflow-y-scroll overflow-x-scroll py-2" ref={table}>
-            <tr className="[&>th]:min-w-32 font-bold">
-                <th scope="col">id</th>
-                {variables.map((variable) => (
-                    <th scope="col">{variable.name}</th>
-                ))}
-            </tr>
-            <tbody className="[&>*>*]:font-mono border-collapse [&>*>*]:border [&>*>*]:border-black py-2">
+        <table className="mx-2 w-content block text-center [&>*>*>*]:min-w-32 [&>*>*>*]:font-mono border-collapse [&>*>*>*]:border [&>*>*>*]:border-black overflow-y-scroll overflow-x-scroll py-2" ref={table}>
+            <thead>
+                <tr className="font-bold">
+                    <th key='id' scope="col">id</th>
+                    {variables.map((variable) => (
+                        <th key={variable.name} scope="col">{variable.name}</th>
+                    ))}
+                </tr>
+            </thead>
+            <tbody>
                 {dataRows}
             </tbody>
         </table>
