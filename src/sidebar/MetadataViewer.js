@@ -56,10 +56,6 @@ export default function MetadataViewer({ data, variables }) {
 const VariableInfo = ({ variable }) => {
     const [open, setOpen] = useState(false);
 
-    const toggleInfo = () => {
-        setOpen(!open);
-    }
-
     return (
         <div className='bg-secondary-300 min-h-10 p-2 text-black relative rounded-sm'>
             <div className="flex flex-row justify-between cursor-pointer" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)} >
@@ -69,6 +65,7 @@ const VariableInfo = ({ variable }) => {
                 </button>
             </div>
             {open &&
+                /* when hovering, display the panel */
                 <div className="absolute w-full m-0 bg-primary-300 text-black grid grid-cols-2 gap-4 z-20 left-0 top-10 p-2 rounded-br-lg rounded-bl-lg">
                     <span>Type: </span> <span>{variable.dtype}</span>
                     <span>Minimum:</span> <span>{Math.round(variable.minValue * 10000) / 10000}</span>
@@ -87,7 +84,7 @@ const DataTable = ({ data, variables }) => {
     const [scrollPosition, setScrollPosition] = useState(0);
     const table = useRef(null);
     const [dataRows, setDataRows] = useState([]);
-    const [itemRowHeight, setItemRowHeight] = useState(32);
+    const itemRowHeight = 32; // 32 pixels (defined in index.css)
 
     const view_height = Math.max(
         document.documentElement.clientHeight,
@@ -116,7 +113,7 @@ const DataTable = ({ data, variables }) => {
             setDisplayStart(displayStartPosition);
             setDisplayEnd(displayEndPosition);
         },
-        [data.length]
+        [data.length, offset, rowsToRender]
     );
 
     useEffect(() => {
@@ -124,21 +121,23 @@ const DataTable = ({ data, variables }) => {
             return;
         }
 
+        let _table = table.current;
+
         const onScroll = throttle(() => {
-            const scrollTop = table.current.scrollTop;
+            const scrollTop = _table.scrollTop;
             if (data.length !== 0) {
                 setScrollPosition(scrollTop);
                 setDisplayPositions(scrollTop);
             }
         }, 50);
-        table.current.addEventListener("scroll", onScroll);
+        _table.addEventListener("scroll", onScroll);
 
         return () => {
-            if(table.current) {
-                table.current.removeEventListener("scroll", onScroll);
+            if(_table) {
+                _table.removeEventListener("scroll", onScroll);
             }
         };
-    }, [setDisplayPositions, data.length, table]);
+    }, [setDisplayPositions, data.length]);
 
     useEffect(() => {
         setDisplayPositions(scrollPosition);
