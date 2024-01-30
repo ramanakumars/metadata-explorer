@@ -17,7 +17,7 @@ export default function MetadataViewer({ }) {
 
     return (
         <>
-            <div className={"bg-primary-100 absolute left-0 top-0 bottom-0 w-full h-full opacity-50 z-10 overflow-hidden box-border " + is_visible} onClick={togglePopup}>
+            <div className={"bg-primary-100 fixed left-0 top-0 bottom-0 right-0 h-full w-full opacity-50 z-10 overflow-clip " + is_visible} onClick={togglePopup}>
                 &nbsp;
             </div>
             <div className="flex flex-row justify-center">
@@ -35,10 +35,10 @@ export default function MetadataViewer({ }) {
                         Total number of entries: {data.length}
                     </span>
 
-                    <div className="relative w-full grid grid-cols-5 justify-evenly [&>*]:my-2 z-20 overflow-x-visible overflow-y-hidden">
-                        <div className="relative flex flex-col col-span-1 overflow-y-scroll">
+                    <div className="w-full grid grid-cols-5 justify-evenly [&>*]:my-2 z-20 overflow-x-visible overflow-y-hidden">
+                        <div id='variable-container' className="flex flex-col col-span-1 overflow-y-scroll scroll-smooth">
                             <h1 className="font-bold text-md">Variables:</h1>
-                            <div className='relative grid grid-cols-1 gap-4'>
+                            <div className='grid grid-cols-1 gap-4'>
                                 {variables.map((variable) => (
                                     <VariableInfo key={variable.name} variable={variable} />
                                 ))}
@@ -59,10 +59,16 @@ export default function MetadataViewer({ }) {
 const VariableInfo = ({ variable }) => {
     const [open, setOpen] = useState(false);
 
+    useEffect(() => {
+        if(open) {
+            document.getElementById(variable.name + "_details").scrollIntoView();
+        }
+    }, [open]);
+
     return (
-        <div className="p-0">
+        <div id={variable.name + "_details"} className="p-0">
             <div className='bg-secondary-300 my-0 min-h-10 p-2 text-black rounded-sm box-border'>
-                <div className="flex flex-row justify-between cursor-pointer" onClick={() => setOpen(!open)} >
+                <div className="flex flex-row justify-between cursor-pointer" onClick={(e) => {setOpen(!open)}} >
                     <span>{variable.name}</span>
                     <button className="mx-2 w-6 h-6 box-border inline-block bg-white border-2 p-0 rounded-full text-center align-center font-bold text-black hover:bg-white">
                         <MdArrowDropDown className="w-full h-4" />
