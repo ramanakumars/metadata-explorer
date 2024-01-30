@@ -90,7 +90,13 @@ const Filter = forwardRef(function Filter({ id, variables, removeFilter, onChang
             return true;
         }
 
-        var value = metadata[_selected_variable.name];
+        var value;
+
+        if (_selected_variable.dtype === 'float') {
+            value = parseFloat(metadata[_selected_variable.name])
+        } else if (_selected_variable.dtype === 'int') {
+            value = parseInt(metadata[_selected_variable.name]);
+        }
 
         /* if the filter is a range, then check the minimum and maximum */
         if (_filter_mode === 'range') {
@@ -129,7 +135,7 @@ const Filter = forwardRef(function Filter({ id, variables, removeFilter, onChang
                 if (_filter_mode === 'range') {
                     setFilterValue([_selected_variable.minValue, _selected_variable.maxValue]);
                 } else if (_filter_mode === 'value') {
-                /* if it is a value, then set this to zero. not the best default, but it works for now */
+                    /* if it is a value, then set this to zero. not the best default, but it works for now */
                     setFilterValue(0);
                 }
             }
@@ -176,7 +182,7 @@ const Filter = forwardRef(function Filter({ id, variables, removeFilter, onChang
             <div className='w-full flex flex-row justify-end'>
                 {(_is_locked && _is_filled) &&
                     <button onClick={() => setLock(false)} className="mx-2 w-6 h-6 box-border inline-block bg-white border-2 p-0 text-center rounded-full align-center font-bold text-black hover:bg-white hover:border-black">
-                        <VscEdit className="w-full h-4 "/>
+                        <VscEdit className="w-full h-4 " />
                     </button>
                 }
                 <button onClick={() => removeFilter(id)} className="mx-2 w-6 h-6 box-border inline-block bg-white border-2 p-0 rounded-full text-center align-center font-bold text-black hover:bg-white hover:border-black">
@@ -211,7 +217,7 @@ const Filter = forwardRef(function Filter({ id, variables, removeFilter, onChang
                                             key={_selected_variable.name + "_range"}
                                             minValue={_selected_variable.minValue}
                                             maxValue={_selected_variable.maxValue}
-                                            step={_selected_variable.dtype == 'int'? 1 : 0.01}
+                                            step={_selected_variable.dtype == 'int' ? 1 : 0.01}
                                             type={_selected_variable.dtype.includes('float') ? ('float') : ('int')}
                                             text={'Choose range for ' + _selected_variable.name}
                                             currentMin={_filter_value[0]}
