@@ -36,6 +36,8 @@
     ]
   },
   "devDependencies": {
+    "lodash": "^4.17.21",
+    "lodash.throttle": "^4.1.1",
     "multi-range-slider-react": "^2.0.7",
     "plotly.js": "^2.27.0",
     "react-icons": "^5.0.1",

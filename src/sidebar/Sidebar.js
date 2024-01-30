@@ -88,6 +88,10 @@ export default function Sidebar({ setParentData }) {
             return;
         }
 
+        if (!filter_group.current) {
+            return;
+        }
+
         const _data = data.filter(_dat => filter_group.current.checkMetadata(_dat.metadata));
 
         const _variables = variables.map((vari) => vari.name);
@@ -128,18 +132,11 @@ export default function Sidebar({ setParentData }) {
                 var_data.minValue = var_data.currentMin = Math.min(...variable_sub);
                 var_data.maxValue = var_data.currentMax = Math.max(...variable_sub);
 
-                // const checkFloat = (value) => (parseFloat(value) === value);
-                // const checkInt = (value) => (parseInt(value) === value);
-
                 if (variable_sub.every(checkInt)) {
                     var_data.dtype = 'int'
                 } else if (variable_sub.every(checkFloat)) {
                     var_data.dtype = 'float';
                 } else {
-                    console.log(variable + " has non-numeric values");
-                    console.log(variable_sub.filter((e) => !checkFloat(e)));
-
-
                     var_data.dtype = null;
                 }
                 return var_data;
@@ -175,7 +172,7 @@ export default function Sidebar({ setParentData }) {
                 :
                 <></>
             }
-            {file !== null ?
+            {(file && (variables.length > 0))  ?
                 <FilterGroup
                     ref={filter_group}
                     variables={variables}
