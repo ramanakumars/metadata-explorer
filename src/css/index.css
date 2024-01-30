@@ -86,3 +86,11 @@ button, input[type=submit]{
 .bar-inner {
   @apply bg-primary-800 shadow-none border-0 !important;
 }
+
+tr {
+  height: 32px;
+}
+
+td, th {
+  padding: 0px 0.25em;
+}

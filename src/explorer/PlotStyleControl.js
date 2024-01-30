@@ -44,7 +44,7 @@ export default function PlotStyleControl({ setPlotStyle }) {
                 <Select
                     id='plot_colorscale'
                     var_name='Colorscale'
-                    variables={["bwr", "viridis", "gist_heat"].map((vari) => ({ 'name': vari }))}
+                    variables={["bwr", "Viridis", "Hot", "YlOrRd", "Jet"].map((vari) => ({ 'name': vari }))}
                     onChange={setColorScale}
                     value={colorscale}
                 />
