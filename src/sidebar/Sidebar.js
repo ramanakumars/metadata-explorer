@@ -1,9 +1,9 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useContext } from "react";
 import '../css/index.css';
 import MetadataPicker from "./MetadataPicker";
 import FilePicker from "./FilePicker";
 import { FilterGroup } from "../explorer/VariableFilters";
-import MetadataViewer from "./MetadataViewer";
+import { DataContext, VariableContext } from "../App";
 
 
 // from https://stackoverflow.com/questions/12467542/how-can-i-check-if-a-string-is-a-float
@@ -44,47 +44,47 @@ const validateMetadata = (metadata) => {
     return metadata.filter(hasKeys);
 }
 
-export default function Sidebar({ setParentData }) {
+export default function Sidebar({ lockPlotMetadata }) {
     const [file, setFile] = useState(null);
-    const [data, setMetadata] = useState([]);
-    const [variables, setVariables] = useState([]);
+    const [file_data, setFileMetadata] = useState([]);
+    const { _, setMetadata } = useContext(DataContext);
+    const { variables, setVariables } = useContext(VariableContext);
     const [plot_metadata, setPlotMetadata] = useState({});
     const [filters, updateFilters] = useState(0);
 
     const filter_group = useRef(null);
-    const metadata_viewer = useRef(null);
 
     /* read in a file and set the metadata */
     const readFile = (file) => {
         const fileReader = new FileReader();
         fileReader.readAsText(file, "UTF-8");
         fileReader.onload = e => {
-            setMetadata(validateMetadata(JSON.parse(e.target.result)));
+            setFileMetadata(validateMetadata(JSON.parse(e.target.result)));
         }
     }
 
     /* hook to update the Sidebar class when file is changed */
     useEffect(() => {
-        setMetadata([]);
+        setFileMetadata([]);
         if ((file !== null)) {
             readFile(file);
         } else {
-            setMetadata([]);
+            setFileMetadata([]);
         }
     }, [file]);
 
     /* reset the plotting if the data or variables are bad */
     useEffect(() => {
-        if (data.length < 1) {
+        if (file_data.length < 1) {
             setPlotMetadata({});
             setVariables([]);
-            setParentData({});
+            lockPlotMetadata({});
         }
-    }, [data])
+    }, [file_data])
 
     /* check the plot metadata and enable plotting after validating */
     useEffect(() => {
-        if (data.length === 0) {
+        if (file_data.length === 0) {
             return;
         }
 
@@ -92,34 +92,21 @@ export default function Sidebar({ setParentData }) {
             return;
         }
 
-        const _data = data.filter(_dat => filter_group.current.checkMetadata(_dat.metadata));
+        setMetadata(file_data.filter(_dat => filter_group.current.checkMetadata(_dat.metadata)));
 
         const _variables = variables.map((vari) => vari.name);
         if ((plot_metadata.x !== undefined) && (plot_metadata.y !== undefined) && (_variables.includes(plot_metadata.x)) && (_variables.includes(plot_metadata.y))) {
-            const _plot_data = {
-                plot_variables: plot_metadata,
-                data: _data.map((dat) => (
-                    {
-                        id: dat.id,
-                        url: dat.url,
-                        x: dat.metadata[plot_metadata.x],
-                        y: dat.metadata[plot_metadata.y],
-                        // pass in null values to the color if "None" is selected
-                        c: plot_metadata.c === "None" ? null : dat.metadata[plot_metadata.c]
-                    }
-                ))
-            };
-            setParentData(_plot_data);
+            lockPlotMetadata(plot_metadata);
         }
-    }, [data, variables, plot_metadata, filters]);
+    }, [file_data, variables, plot_metadata, filters]);
 
     /* when the data is set, loop through it and get the
      * relevant plotting variables
      */
     useEffect(() => {
-        if (data.length > 0) {
+        if (file_data.length > 0) {
             // get the variables from the first data entry
-            let _variables = Object.keys(data[0].metadata);
+            let _variables = Object.keys(file_data[0].metadata);
 
             // loop over the metadata keys and find the minimum and maximum
             let variable_data = _variables.map((variable) => {
@@ -127,7 +114,7 @@ export default function Sidebar({ setParentData }) {
                 let var_data = {};
                 var_data.name = variable;
 
-                let variable_sub = data.map((dati) => ( "" + dati.metadata[variable]));
+                let variable_sub = file_data.map((dati) => ("" + dati.metadata[variable]));
 
                 var_data.minValue = var_data.currentMin = Math.min(...variable_sub);
                 var_data.maxValue = var_data.currentMax = Math.max(...variable_sub);
@@ -151,7 +138,22 @@ export default function Sidebar({ setParentData }) {
 
             setVariables(variable_data);
         }
-    }, [data]);
+    }, [file_data]);
+
+    useEffect(() => {
+        if (variables.length < 1) {
+            return;
+        }
+
+        const metadataIsValid = (meta) => (
+            variables.every((variable) => {
+                return !isNaN(meta.metadata[variable.name]);
+            })
+        );
+
+        setMetadata(file_data.filter(metadataIsValid));
+
+    }, [variables]);
 
     return (
         <div id='sidebar' className='min-h-dvh col-span-1 bg-primary-400 text-black flex-auto flex-col px-2'>
@@ -159,20 +161,14 @@ export default function Sidebar({ setParentData }) {
                 setFile={setFile}
             />
             {variables.length > 0 ?
-                <>
-                    <MetadataViewer
-                        variables={variables}
-                        data={data}
-                    />,
-                    <MetadataPicker
-                        variables={variables}
-                        handleChange={setPlotMetadata}
-                    />
-                </>
+                <MetadataPicker
+                    variables={variables}
+                    handleChange={setPlotMetadata}
+                />
                 :
                 <></>
             }
-            {(file && (variables.length > 0))  ?
+            {(file && (variables.length > 0)) ?
                 <FilterGroup
                     ref={filter_group}
                     variables={variables}

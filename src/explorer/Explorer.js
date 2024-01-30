@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Plot from "react-plotly.js";
 import Images from "./Images";
 import PlotStyleControl from "./PlotStyleControl";
+import MetadataViewer from "./MetadataViewer";
+import { DataContext, VariableContext } from "../App";
 
 
 const mean = (val) => (val.reduce((a, b) => (parseFloat(a) + parseFloat(b))) / val.length);
 
-export default function Explorer({ data }) {
+export default function Explorer({ plot_metadata }) {
     const [plot_data, setPlotlyData] = useState([]);
     const [image_data, setImageData] = useState([]);
     const [plot_style, setPlotStyle] = useState({
@@ -19,6 +21,8 @@ export default function Explorer({ data }) {
         hovermode: "closest",
         height: 600
     });
+    const { data, _ } = useContext(DataContext);
+    const { variables, __ } = useContext(VariableContext);
 
     /* handle the plot selection
      * this function will update the images based on the selection 
@@ -31,7 +35,7 @@ export default function Explorer({ data }) {
 
         for (var i = 0; i < e.points.length; i++) {
             const idx = e.points[i].pointNumber;
-            _data.push({ url: data.url[idx], id: data.id[idx] });
+            _data.push({ url: data[idx].url, id: data[idx].id });
         }
         setImageData(_data);
     };
@@ -41,9 +45,9 @@ export default function Explorer({ data }) {
      * the selection is reset
      */
     const resetPlotSelection = () => {
-        if ((data.x.length > 0) && (data.y.length > 0)) {
+        if (data.length > 0) {
             setImageData((
-                data.url.map((url, i) => ({ url: url, id: data.id[i] }))
+                data.map((dati) => ({ url: dati.url, id: dati.id }))
             ));
         }
     };
@@ -52,7 +56,7 @@ export default function Explorer({ data }) {
     const handleHover = (e) => {
         const hoverlayer = document.getElementsByClassName('hoverlayer')[0];
         const new_child = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-        new_child.setAttributeNS('http://www.w3.org/1999/xlink', 'href', data.url[e.points[0].pointNumber][0]);
+        new_child.setAttributeNS('http://www.w3.org/1999/xlink', 'href', data[e.points[0].pointNumber].url[0]);
         new_child.setAttribute('x', e.event.pointerX);
         new_child.setAttribute('y', e.event.pointerY);
         new_child.setAttribute('width', 100);
@@ -71,17 +75,39 @@ export default function Explorer({ data }) {
         }
     }
 
+    // useEffect(() => {
+    //     const validatedata = (val) => (!isNaN(val.x) && (!isNaN(val.y)));
+    //     const datasub = data.data.filter(validatedata);
+
+    //     if (datasub.length > 0) {
+    //         setPlotMetadata({
+    //             plot_variables: data.plot_variables,
+    //             id: datasub.map((dat) => (dat.id)),
+    //             url: datasub.map((dat) => (dat.url)),
+    //             x: datasub.map((dat) => (dat.x)),
+    //             y: datasub.map((dat) => (dat.y)),
+    //             c: (datasub === null) ? null : datasub.map((dat => (dat.c)))
+    //         });
+    //     }
+    // }, [data]);
+
     useEffect(() => {
-        if ((data.x === undefined) || (data.y === undefined)) {
+        if ((!data) || (!plot_metadata)) {
+            setPlotlyData([]);
+            setImageData([]);
+            return;
+        }
+        
+        if ((data.length < 1) || (!plot_metadata.x) || (!plot_metadata.y)) {
             setPlotlyData([]);
             setImageData([]);
             return;
         }
 
-        if ((data.x.length > 0) && (data.y.length > 0)) {
+        if (data.length > 0) {
             const _data = {
-                x: data.x,
-                y: data.y,
+                x: data.map((dati) => (dati.metadata[plot_metadata.x])),
+                y: data.map((dati) => (dati.metadata[plot_metadata.y])),
                 mode: 'markers',
                 type: 'scattergl',
                 hoverinfo: 'none',
@@ -91,18 +117,18 @@ export default function Explorer({ data }) {
                 }
             };
 
-            if ((data.plot_variables.c === "None") || (data.plot_variables.c === "")) {
+            if ((plot_metadata.c === "None") || (plot_metadata.c === "")) {
                 _data.marker.color = _data.x.map(() => ("dodgerblue"));
                 _data.marker.colorbar = undefined;
             } else {
-                _data.marker.color = data.c; //normalize(data.c, plot_style.clamp_colorscale_mean);
+                _data.marker.color = data.map((dati) => (dati.metadata[plot_metadata.c])); //normalize(data.c, plot_style.clamp_colorscale_mean);
                 _data.marker.colorscale = plot_style.colorscale;
-                _data.marker.cmin = plot_style.clamp_colorscale_mean ? null : Math.min(...data.c);
-                _data.marker.cmax = plot_style.clamp_colorscale_mean ? null : Math.max(...data.c);
-                _data.marker.cmid = plot_style.clamp_colorscale_mean ? 0 : mean(data.c);
+                _data.marker.cmin = plot_style.clamp_colorscale_mean ? null : Math.min(..._data.marker.color);
+                _data.marker.cmax = plot_style.clamp_colorscale_mean ? null : Math.max(..._data.marker.color);
+                _data.marker.cmid = plot_style.clamp_colorscale_mean ? 0 : mean(_data.marker.color);
                 _data.marker.colorbar = {
                     title: {
-                        text: data.plot_variables.c,
+                        text: plot_metadata.c,
                         side: 'right'
                     }
                 }
@@ -110,19 +136,20 @@ export default function Explorer({ data }) {
 
             setPlotlyData([_data]);
 
-            setImageData((
-                data.url.map((url, i) => ({ url: url, id: data.id[i] }))
-            ));
+            setImageData(
+                data.map((dati) => ({ url: dati.url, id: dati.id }))
+            );
 
             var _layout = { ...layout };
-            _layout.xaxis = { "title": data.plot_variables.x }
-            _layout.yaxis = { "title": data.plot_variables.y }
+            _layout.xaxis = { "title": plot_metadata.x }
+            _layout.yaxis = { "title": plot_metadata.y }
             setLayout(_layout);
         }
-    }, [data, plot_style]);
+    }, [data, plot_style, plot_metadata]);
 
     return (
         <div id='explorer' className='p-4 col-span-4 overflow-x-hidden flex flex-col'>
+            <MetadataViewer />
             <PlotStyleControl
                 setPlotStyle={setPlotStyle}
             />

@@ -1,12 +1,15 @@
-import { useCallback, useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useState, useRef, useContext } from "react";
 import { RxCross2 } from "react-icons/rx";
 import { MdArrowDropDown } from "react-icons/md";
 import throttle from "lodash.throttle";
+import { DataContext, VariableContext } from "../App";
 
 const visibility_states = ['hidden', 'visible']
 
-export default function MetadataViewer({ data, variables }) {
+export default function MetadataViewer({ }) {
     const [is_visible, setVisible] = useState(visibility_states[0]);
+    const { data, setMetadata } = useContext(DataContext);
+    const { variables, setVariables } = useContext(VariableContext);
 
     const togglePopup = () => {
         setVisible(visibility_states[+!visibility_states.indexOf(is_visible)]);
@@ -14,37 +17,37 @@ export default function MetadataViewer({ data, variables }) {
 
     return (
         <>
-            <div className={"bg-primary-100 absolute left-0 top-0 w-full h-screen opacity-50 z-10 " + is_visible} onClick={togglePopup}>
+            <div className={"bg-primary-100 absolute left-0 top-0 bottom-0 w-full h-full opacity-50 z-10 overflow-hidden box-border " + is_visible} onClick={togglePopup}>
                 &nbsp;
             </div>
             <div className="flex flex-row justify-center">
                 <button onClick={togglePopup} className="min-h-8 w-40 text-white bg-primary-800 hover:bg-primary-600">View data</button>
             </div>
             {is_visible === "visible" &&
-                <div className={'flex flex-col flex-nowrap fixed mx-auto z-10 w-3/4 h-3/4 top-1/2 left-1/2 box-border bg-white -translate-x-1/2 -translate-y-1/2 p-4 rounded-lg overflow-hidden border-black border-2'}>
+                <div className={'flex flex-col flex-nowrap fixed mx-auto z-20 w-3/4 h-3/4 top-1/2 left-1/2 box-border bg-white -translate-x-1/2 -translate-y-1/2 p-4 rounded-lg overflow-hidden border-black border-2'}>
                     <div className='w-full flex flex-row justify-end'>
                         <button onClick={togglePopup} className="mx-2 w-6 h-6 box-border inline-block bg-white border-2 p-0 rounded-full text-center align-center font-bold text-black hover:bg-white hover:border-black">
                             <RxCross2 className="w-full h-4" />
                         </button>
                     </div>
 
-                    <div className="w-full flex flex-col justify-evenly [&>*]:my-2 overflow-hidden">
-                        <span>
-                            Total number of entries: {data.length}
-                        </span>
+                    <span>
+                        Total number of entries: {data.length}
+                    </span>
 
-                        <div className="flex flex-col">
+                    <div className="relative w-full grid grid-cols-5 justify-evenly [&>*]:my-2 z-20 overflow-x-visible overflow-y-hidden">
+                        <div className="relative flex flex-col col-span-1 overflow-y-scroll">
                             <h1 className="font-bold text-md">Variables:</h1>
-                            <div className='grid grid-cols-4 gap-4'>
+                            <div className='relative grid grid-cols-1 gap-4'>
                                 {variables.map((variable) => (
                                     <VariableInfo key={variable.name} variable={variable} />
                                 ))}
                             </div>
                         </div>
 
-                        <div className="flex flex-col justify-center box-border overflow-hidden">
+                        <div className="flex flex-col justify-center box-border col-span-4 overflow-hidden">
                             <h1 className="font-bold text-md">Data:</h1>
-                            <DataTable data={data} variables={variables} />
+                            <DataTable />
                         </div>
                     </div>
                 </div>
@@ -57,16 +60,18 @@ const VariableInfo = ({ variable }) => {
     const [open, setOpen] = useState(false);
 
     return (
-        <div className='bg-secondary-300 min-h-10 p-2 text-black relative rounded-sm'>
-            <div className="flex flex-row justify-between cursor-pointer" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)} >
-                <span>{variable.name}</span>
-                <button className="mx-2 w-6 h-6 box-border inline-block bg-white border-2 p-0 rounded-full text-center align-center font-bold text-black hover:bg-white">
-                    <MdArrowDropDown className="w-full h-4" />
-                </button>
+        <div className="p-0">
+            <div className='bg-secondary-300 my-0 min-h-10 p-2 text-black rounded-sm box-border'>
+                <div className="flex flex-row justify-between cursor-pointer" onClick={() => setOpen(!open)} >
+                    <span>{variable.name}</span>
+                    <button className="mx-2 w-6 h-6 box-border inline-block bg-white border-2 p-0 rounded-full text-center align-center font-bold text-black hover:bg-white">
+                        <MdArrowDropDown className="w-full h-4" />
+                    </button>
+                </div>
             </div>
             {open &&
                 /* when hovering, display the panel */
-                <div className="absolute w-full m-0 bg-primary-300 text-black grid grid-cols-2 gap-4 z-20 left-0 top-10 p-2 rounded-br-lg rounded-bl-lg">
+                <div className="relative my-0 w-full bg-primary-300 text-black grid grid-cols-2 gap-4 left-0 p-2">
                     <span>Type: </span> <span>{variable.dtype}</span>
                     <span>Minimum:</span> <span>{Math.round(variable.minValue * 10000) / 10000}</span>
                     <span>Maximum: </span> <span>{Math.round(variable.maxValue * 10000) / 10000}</span>
@@ -78,13 +83,15 @@ const VariableInfo = ({ variable }) => {
 
 
 /* adapted from https://www.bekk.christmas/post/2021/2/how-to-lazy-render-large-data-tables-to-up-performance */
-const DataTable = ({ data, variables }) => {
+const DataTable = ({ }) => {
     const [displayStart, setDisplayStart] = useState(0);
     const [displayEnd, setDisplayEnd] = useState(0);
     const [scrollPosition, setScrollPosition] = useState(0);
     const table = useRef(null);
     const [dataRows, setDataRows] = useState([]);
     const itemRowHeight = 32; // 32 pixels (defined in index.css)
+    const { data, setMetadata } = useContext(DataContext);
+    const { variables, setVariables } = useContext(VariableContext);
 
     const view_height = Math.max(
         document.documentElement.clientHeight,
@@ -117,7 +124,7 @@ const DataTable = ({ data, variables }) => {
     );
 
     useEffect(() => {
-        if(!table.current) {
+        if (!table.current) {
             return;
         }
 
@@ -133,7 +140,7 @@ const DataTable = ({ data, variables }) => {
         _table.addEventListener("scroll", onScroll);
 
         return () => {
-            if(_table) {
+            if (_table) {
                 _table.removeEventListener("scroll", onScroll);
             }
         };
@@ -181,7 +188,7 @@ const DataTable = ({ data, variables }) => {
     }, [displayStart, displayEnd]);
 
     return (
-        <table className="mx-2 w-content block text-center [&>*>*>*]:min-w-32 [&>*>*>*]:font-mono border-collapse [&>*>*>*]:border [&>*>*>*]:border-black overflow-y-scroll overflow-x-scroll py-2" ref={table}>
+        <table className="mx-2 h-max w-content block text-center [&>*>*>*]:min-w-32 [&>*>*>*]:font-mono border-collapse [&>*>*>*]:border [&>*>*>*]:border-black overflow-y-scroll overflow-x-scroll py-2" ref={table}>
             <thead>
                 <tr className="font-bold">
                     <th key='id' scope="col">id</th>
