@@ -73,7 +73,7 @@ export default function Explorer({ data }) {
 
     useEffect(() => {
         if ((data.x === undefined) || (data.y === undefined)) {
-            setPlotlyData({});
+            setPlotlyData([]);
             setImageData([]);
             return;
         }
