@@ -122,13 +122,13 @@ export default function PlotStyleControl({ setPlotStyle }) {
                                     <Checkbox
                                         id='x_grid'
                                         text='X-axis grid'
-                                        onChange={toggleYGrid}
+                                        onChange={toggleXGrid}
                                         value={x_grid}
                                     />
                                     <Checkbox
                                         id='y_grid'
                                         text='Y-axis grid'
-                                        onChange={toggleXGrid}
+                                        onChange={toggleYGrid}
                                         value={y_grid}
                                     />
                                 </div>
