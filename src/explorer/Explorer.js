@@ -75,22 +75,6 @@ export default function Explorer({ plot_metadata }) {
         }
     }
 
-    // useEffect(() => {
-    //     const validatedata = (val) => (!isNaN(val.x) && (!isNaN(val.y)));
-    //     const datasub = data.data.filter(validatedata);
-
-    //     if (datasub.length > 0) {
-    //         setPlotMetadata({
-    //             plot_variables: data.plot_variables,
-    //             id: datasub.map((dat) => (dat.id)),
-    //             url: datasub.map((dat) => (dat.url)),
-    //             x: datasub.map((dat) => (dat.x)),
-    //             y: datasub.map((dat) => (dat.y)),
-    //             c: (datasub === null) ? null : datasub.map((dat => (dat.c)))
-    //         });
-    //     }
-    // }, [data]);
-
     useEffect(() => {
         if ((!data) || (!plot_metadata)) {
             setPlotlyData([]);
@@ -141,18 +125,18 @@ export default function Explorer({ plot_metadata }) {
             );
 
             var _layout = { ...layout };
-            _layout.xaxis = { "title": plot_metadata.x }
-            _layout.yaxis = { "title": plot_metadata.y }
+            _layout.xaxis = { "title": plot_metadata.x, visible: plot_style.x_labels, showgrid: plot_style.x_grid }
+            _layout.yaxis = { "title": plot_metadata.y, visible: plot_style.y_labels, showgrid: plot_style.y_grid }
             setLayout(_layout);
         }
     }, [data, plot_style, plot_metadata]);
 
     return (
         <div id='explorer' className='p-4 col-span-4 overflow-x-hidden flex flex-col'>
-            <MetadataViewer />
-            <PlotStyleControl
-                setPlotStyle={setPlotStyle}
-            />
+            <div className='flex flex-row justify-evenly'>
+                <MetadataViewer />
+                <PlotStyleControl setPlotStyle={setPlotStyle} />
+            </div>
             <Plot
                 data={plot_data}
                 layout={layout}
