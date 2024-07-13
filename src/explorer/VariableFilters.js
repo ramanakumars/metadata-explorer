@@ -1,7 +1,7 @@
 import { InputMultiRange, Select, InputNumber } from "../tools/Inputs";
 import React, { useState, forwardRef, useEffect, createRef, createElement, useRef, useImperativeHandle } from "react";
 import { VscEdit } from "react-icons/vsc";
-import { RxCross2 } from "react-icons/rx";
+import { RxCross2, RxEyeOpen, RxEyeNone } from "react-icons/rx";
 
 /* holds and renders the dynamic list of filters for the plot */
 export const FilterGroup = forwardRef(function FilterGroup({ variables, onChange }, ref) {
@@ -82,11 +82,12 @@ const Filter = forwardRef(function Filter({ id, variables, removeFilter, onChang
     const [_filter_mode, setFilterMode] = useState("");
     const [_filter_value, setFilterValue] = useState(null);
     const [_is_locked, setLock] = useState(false);
+    const [_is_enabled, setEnabled] = useState(true);
     const [_is_filled, setFilled] = useState(false);
 
     /* function to check the metadata using the current filter */
     const checkMetadata = (metadata) => {
-        if ((!_is_filled) | (!_is_locked)) {
+        if ((!_is_filled) | (!_is_locked) | (!_is_enabled)) {
             return true;
         }
 
@@ -153,10 +154,16 @@ const Filter = forwardRef(function Filter({ id, variables, removeFilter, onChang
         }
     }, [_is_locked]);
 
+    useEffect(() => {
+        onChange()
+    }, [_is_enabled]);
+
+
     /* check the values to see if it is filled, and lock the state when submit is hit */
     const checkAndLock = () => {
         if (_is_filled) {
             setLock(true);
+            setEnabled(true);
         }
     }
 
@@ -181,9 +188,20 @@ const Filter = forwardRef(function Filter({ id, variables, removeFilter, onChang
         <div className='w-full flex flex-col p-2 bg-primary-400 border-t-2 border-b-2'>
             <div className='w-full flex flex-row justify-end'>
                 {(_is_locked && _is_filled) &&
-                    <button onClick={() => setLock(false)} className="mx-2 w-6 h-6 box-border inline-block bg-white border-2 p-0 text-center rounded-full align-center font-bold text-black hover:bg-white hover:border-black">
-                        <VscEdit className="w-full h-4 " />
-                    </button>
+                    <>
+                        <button onClick={() => setLock(false)} className="mx-2 w-6 h-6 box-border inline-block bg-white border-2 p-0 text-center rounded-full align-center font-bold text-black hover:bg-white hover:border-black">
+                            <VscEdit className="w-full h-4 " />
+                        </button>
+                        {((_is_enabled) ?
+                            <button onClick={() => setEnabled(false)} className="mx-2 w-6 h-6 box-border inline-block bg-white border-2 p-0 text-center rounded-full align-center font-bold text-black hover:bg-white hover:border-black">
+                                <RxEyeNone className="w-full h-4 " />
+                            </button>
+                            :
+                            <button onClick={() => setEnabled(true)} className="mx-2 w-6 h-6 box-border inline-block bg-white border-2 p-0 text-center rounded-full align-center font-bold text-black hover:bg-white hover:border-black">
+                                <RxEyeOpen className="w-full h-4 " />
+                            </button>
+                        )}
+                    </>
                 }
                 <button onClick={() => removeFilter(id)} className="mx-2 w-6 h-6 box-border inline-block bg-white border-2 p-0 rounded-full text-center align-center font-bold text-black hover:bg-white hover:border-black">
                     <RxCross2 className="w-full h-4" />
@@ -248,7 +266,7 @@ const Filter = forwardRef(function Filter({ id, variables, removeFilter, onChang
                 </div>
             }
             {(_is_locked && _is_filled) &&
-                <div className='w-full flex flex-col [&>span]:grid-cols-8 [&>span>label]:col-span-3 [&>span>select]:col-span-5 '>
+                <div className={'w-full flex flex-col [&>span]:grid-cols-8 [&>span>label]:col-span-3 [&>span>select]:col-span-5 ' + ((!_is_enabled) && ' opacity-50')}>
                     <h2 className='font-bold'>
                         Filter for <i>{_selected_variable.name}</i>
                     </h2>
