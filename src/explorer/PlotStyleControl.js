@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Checkbox, InputNumber, Select, Slider } from "../tools/Inputs";
 import Draggable from "react-draggable";
 import { RxCross2 } from "react-icons/rx";
@@ -19,6 +19,8 @@ export default function PlotStyleControl({ setPlotStyle }) {
 
     const [is_visible, setVisible] = useState(visibility_states[0]);
     const [positions, setPositions] = useState(null);
+
+    const nodeRef = useRef(null);
 
     useEffect(() => {
         setPlotStyle({
@@ -48,8 +50,8 @@ export default function PlotStyleControl({ setPlotStyle }) {
                 <button onClick={togglePopup} className="min-h-8 w-40 text-white bg-primary-800 hover:bg-primary-600">Open plot controls</button>
             </div>
             {is_visible === "visible" &&
-                <Draggable positionOffset={{x: '-50%', y: '-50%'}} position={positions} handle="strong" onDrag={handleDrag}>
-                    <div className='fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 box-border w-1/4 min-h-1/2 z-10 bg-secondary-200 p-4 mx-auto rounded-xl border-dotted border-4 border-black'>
+                <Draggable nodeRef={nodeRef} positionOffset={{x: '-50%', y: '-50%'}} position={positions} handle="strong" onDrag={handleDrag}>
+                    <div ref={nodeRef} className='fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 box-border w-1/4 min-h-1/2 z-10 bg-secondary-200 p-4 mx-auto rounded-xl border-dotted border-4 border-black'>
                         <div className="w-full flex flex-row flex-nowrap items-center contents-center justify-between">
                             <strong className='cursor-move'>
                                 <FiMove className="w-4 h-4" />
