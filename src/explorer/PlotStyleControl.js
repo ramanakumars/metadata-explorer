@@ -15,6 +15,8 @@ export default function PlotStyleControl({ setPlotStyle }) {
     const [y_labels, toggleYLabels] = useState(true);
     const [x_grid, toggleXGrid] = useState(true);
     const [y_grid, toggleYGrid] = useState(true);
+    const [axis_limits, toggleAxisLimits] = useState(false);
+
     const [is_visible, setVisible] = useState(visibility_states[0]);
     const [positions, setPositions] = useState(null);
 
@@ -27,9 +29,10 @@ export default function PlotStyleControl({ setPlotStyle }) {
             x_labels: x_labels,
             y_labels: y_labels,
             x_grid: x_grid,
-            y_grid: y_grid
+            y_grid: y_grid,
+            axis_limits: axis_limits
         });
-    }, [marker_size, marker_opacity, clamp_colorscale_mean, colorscale, x_labels, y_labels, x_grid, y_grid]);
+    }, [marker_size, marker_opacity, clamp_colorscale_mean, colorscale, x_labels, y_labels, x_grid, y_grid, axis_limits]);
 
     const togglePopup = () => {
         setVisible(visibility_states[+!visibility_states.indexOf(is_visible)]);
@@ -130,6 +133,14 @@ export default function PlotStyleControl({ setPlotStyle }) {
                                         text='Y-axis grid'
                                         onChange={toggleYGrid}
                                         value={y_grid}
+                                    />
+                                </div>
+                                <div className="[&>span]:grid-cols-4 [&>span>label]:col-span-3 [&>span>input]:col-span-1">
+                                    <Checkbox
+                                        id='axis_limits'
+                                        text='Force axis limits to entire data'
+                                        onChange={toggleAxisLimits}
+                                        value={axis_limits}
                                     />
                                 </div>
                         </div>

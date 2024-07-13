@@ -3,7 +3,7 @@ import '../css/index.css';
 import MetadataPicker from "./MetadataPicker";
 import FilePicker from "./FilePicker";
 import { FilterGroup } from "../explorer/VariableFilters";
-import { DataContext, VariableContext } from "../App";
+import { DataContext, FileDataContext, VariableContext } from "../App";
 
 
 // from https://stackoverflow.com/questions/12467542/how-can-i-check-if-a-string-is-a-float
@@ -46,7 +46,7 @@ const validateMetadata = (metadata) => {
 
 export default function Sidebar({ lockPlotMetadata }) {
     const [file, setFile] = useState(null);
-    const [file_data, setFileMetadata] = useState([]);
+    const {file_data, setFileData} = useContext(FileDataContext);
     const { _, setMetadata } = useContext(DataContext);
     const { variables, setVariables } = useContext(VariableContext);
     const [plot_metadata, setPlotMetadata] = useState({});
@@ -59,17 +59,17 @@ export default function Sidebar({ lockPlotMetadata }) {
         const fileReader = new FileReader();
         fileReader.readAsText(file, "UTF-8");
         fileReader.onload = e => {
-            setFileMetadata(validateMetadata(JSON.parse(e.target.result)));
+            setFileData(validateMetadata(JSON.parse(e.target.result)));
         }
     }
 
     /* hook to update the Sidebar class when file is changed */
     useEffect(() => {
-        setFileMetadata([]);
+        setFileData([]);
         if ((file !== null)) {
             readFile(file);
         } else {
-            setFileMetadata([]);
+            setFileData([]);
         }
     }, [file]);
 

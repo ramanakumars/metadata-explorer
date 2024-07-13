@@ -3,7 +3,7 @@ import Plot from "react-plotly.js";
 import Images from "./Images";
 import PlotStyleControl from "./PlotStyleControl";
 import MetadataViewer from "./MetadataViewer";
-import { DataContext, VariableContext } from "../App";
+import { DataContext, FileDataContext, VariableContext } from "../App";
 
 
 const mean = (val) => (val.reduce((a, b) => (parseFloat(a) + parseFloat(b))) / val.length);
@@ -22,7 +22,7 @@ export default function Explorer({ plot_metadata }) {
         height: 600
     });
     const { data, _ } = useContext(DataContext);
-    const { variables, __ } = useContext(VariableContext);
+    const {file_data, ___ } = useContext(FileDataContext);
 
     /* handle the plot selection
      * this function will update the images based on the selection 
@@ -127,6 +127,21 @@ export default function Explorer({ plot_metadata }) {
             var _layout = { ...layout };
             _layout.xaxis = { "title": plot_metadata.x, visible: plot_style.x_labels, showgrid: plot_style.x_grid }
             _layout.yaxis = { "title": plot_metadata.y, visible: plot_style.y_labels, showgrid: plot_style.y_grid }
+            if(plot_style.axis_limits) {
+                const xdata = file_data.map((dati) => (Number(dati.metadata[plot_metadata.x])))
+                const ydata = file_data.map((dati) => (Number(dati.metadata[plot_metadata.y])))
+                let xmin = Math.min(...xdata);
+                xmin = xmin - Math.abs(xmin * 0.05);
+                let ymin = Math.min(...ydata);
+                ymin = ymin - Math.abs(ymin * 0.05);
+                _layout.xaxis.autorange = false;
+                _layout.yaxis.autorange = false;
+                _layout.xaxis.range = [xmin, 1.05 * Math.max(...xdata)];
+                _layout.yaxis.range = [ymin, 1.05 * Math.max(...ydata)];
+            } else {
+                _layout.xaxis.autorange = true;
+                _layout.yaxis.autorange = true;
+            }
             setLayout(_layout);
         }
     }, [data, plot_style, plot_metadata]);
