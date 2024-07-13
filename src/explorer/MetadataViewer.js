@@ -24,7 +24,7 @@ export default function MetadataViewer({ }) {
                 <button onClick={togglePopup} className="min-h-8 w-40 text-white bg-primary-800 hover:bg-primary-600">View data</button>
             </div>
             {is_visible === "visible" &&
-                <div className={'flex flex-col flex-nowrap fixed mx-auto z-20 w-3/4 h-3/4 top-1/2 left-1/2 box-border bg-white -translate-x-1/2 -translate-y-1/2 p-4 rounded-lg overflow-hidden border-black border-2'}>
+                <div className={'flex flex-col flex-nowrap fixed mx-auto z-20 w-3/4 h-5/6 top-1/2 left-1/2 box-border bg-white -translate-x-1/2 -translate-y-1/2 p-4 rounded-lg overflow-hidden border-black border-2'}>
                     <div className='w-full flex flex-row justify-end'>
                         <button onClick={togglePopup} className="mx-2 w-6 h-6 box-border inline-block bg-white border-2 p-0 rounded-full text-center align-center font-bold text-black hover:bg-white hover:border-black">
                             <RxCross2 className="w-full h-4" />
